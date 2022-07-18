@@ -1,11 +1,11 @@
-@reboot (sleep 10; python /home/pi/Firmware/app/Act_Power_IR.py) # Power_IR
+#@reboot (sleep 10; python /home/pi/Firmware/app/Act_Power_IR.py) # Power_IR
 @reboot (sleep 10; python /home/pi/Firmware/app/Act_Rele.py) # Rele
 @reboot (sleep 10; sudo python3.5 /home/pi/Firmware/app/Act_Led_RGB.py) # Led
-@reboot (sleep 20; python /home/pi/Firmware/app/Act_Buzzer.py) # Buzzer
+#@reboot (sleep 20; python /home/pi/Firmware/app/Act_Buzzer.py) # Buzzer
 @reboot (sleep 20; python /home/pi/Firmware/app/Sen_QR.py) # Sen_QR
 @reboot (sleep 20; python3.5 /home/pi/Firmware/ComCounter/app.py) # ComCounter
 #@reboot (sleep 35; python /home/pi/Firmware/app/Act_Boton_No_Touch.py) # Boton_No_Touch
-@reboot (sleep 35; /home/pi/Firmware/sh/app_30_sleep.sh) # Teclado
+#@reboot (sleep 35; /home/pi/Firmware/sh/app_30_sleep.sh) # Teclado
 @reboot (sleep 40; python /home/pi/Firmware/app/Pro_Com_Counter.py) # Pro_Com_Counter
 @reboot (sleep 40; python /home/pi/Firmware/app/Pro_Sin_prioridad.py) # Pro_Sin_prioridad
 @reboot (sleep 40; python /home/pi/Firmware/app/Pro_Menu_Web.py) # Pro_Menu_Web
