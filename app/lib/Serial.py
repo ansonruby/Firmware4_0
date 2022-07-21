@@ -40,7 +40,7 @@ from Lib_Rout import *  # importar con los mismos nombres
 #                       CONSTANTES
 #-----------------------------------------------------------
 
-SQ_Mensajes = 1    # 0: NO print  1: Print
+SQ_Mensajes = 0    # 0: NO print  1: Print
 
 Puerto_Serial = '/dev/ttyS0'
 port = serial.Serial(Puerto_Serial, baudrate=9600, timeout=1)
@@ -67,10 +67,13 @@ def Tx_datos():
         rele=rele.rstrip('\r')
 
         if rele == 'Access granted-E': rele = 'EEEEE'
+        elif rele == 'Access granted-S': rele = 'SSSSS'
         else: rele = 'DDDDD'
-        rele = 'EEEEE'
+        #rele = 'SSSSS'
+
 
         if SQ_Mensajes: print 'TX:' + rele
+
         port.write(rele)
         Clear_File(COM_TX_RELE)
 #---------------------------------------------------------------------------------------

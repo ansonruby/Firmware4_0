@@ -75,7 +75,7 @@ def Decision_General():
     # Decision dependiendo del estado del dispositivo y configuracion de prioridades
     # -----------------------------------------------------------------------------
 
-    Prioridad = Get_File(CONF_AUTORIZACION_QR).strip()
+    Prioridad = Get_File(CONF_AUTORIZACION_TECLADO).strip()
 
     # ------- Prioridades de autorizacion ---------------------
     # 0 :   Servidor      -> Dispositivos -> sin counter    F1_17

@@ -1,1 +1,1 @@
-solutions.fusepong.com
+staging.fusepong.com

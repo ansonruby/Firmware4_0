@@ -152,6 +152,7 @@ CONT_RECEIVED_FLAG_PATH = '/home/pi/Firmware/ComCounter/db/flagreceived.txt'    
 
 CONF_AUTORIZACION_QR       = FIRM + CONF + 'Autorizaciones/Qr/Tipos.txt'        #
 CONF_AUTORIZACION_TECLADO  = FIRM + CONF + 'Autorizaciones/Teclado/Tipos.txt'   #
+CONF_AUTORIZACION_NFC      = FIRM + CONF + 'Autorizaciones/Nfc/Tipos.txt'   #
 
 #---------------------------------------------------------------------------------------
 #                                   Servidor

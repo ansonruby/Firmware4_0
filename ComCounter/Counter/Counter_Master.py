@@ -85,10 +85,11 @@ def Get_Rout_server():
 
 def log_in():
     try:
-        data = encrypt({"attributes": {'email': "counter.planta@ocoplast.com",
-                                       'password': "C0unt3rp14ntA2022"}}).decode("utf-8")
-        # data = encrypt({"attributes": {'email': "luding@counter.com",
-        #                'password': "password"}}).decode("utf-8")
+
+        #data = encrypt({"attributes": {'email': "counter.planta@ocoplast.com",
+        #                               'password': "C0unt3rp14ntA2022"}}).decode("utf-8")
+        data = encrypt({"attributes": {'email': "taquilla.reja@fusepong.com",
+                        'password': "password"}}).decode("utf-8")
         petition = requests.post(
             url=cloud_server_domain+"/api/users/sign_in",
             data={"data": data},
