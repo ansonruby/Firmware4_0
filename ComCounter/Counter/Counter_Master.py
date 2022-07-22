@@ -45,6 +45,8 @@ cloud_server_domain = ""
 login_token = ""
 bookingOffice_id = ""
 active_devices = []
+active_server_updater = False
+update_scanners = False
 
 
 def Get_Rout_server():
@@ -85,11 +87,10 @@ def Get_Rout_server():
 
 def log_in():
     try:
-
-        #data = encrypt({"attributes": {'email': "counter.planta@ocoplast.com",
-        #                               'password': "C0unt3rp14ntA2022"}}).decode("utf-8")
-        data = encrypt({"attributes": {'email': "taquilla.reja@fusepong.com",
-                        'password': "password"}}).decode("utf-8")
+        data = encrypt({"attributes": {'email': "counter.planta@ocoplast.com",
+           'password': "C0unt3rp14ntA2022"}}).decode("utf-8")
+        # data = encrypt({"attributes": {'email': "taquilla.reja@fusepong.com",
+        #                'password': "password"}}).decode("utf-8")
         petition = requests.post(
             url=cloud_server_domain+"/api/users/sign_in",
             data={"data": data},
@@ -178,9 +179,7 @@ def get_users():
         df.close()
         if auth_list_text != "":
             in_out = auth_list_text.split("\n")
-    # print(in_out)
     if in_out:
-        # print("in_out")
         petition = requests.post(
             url=cloud_server_domain+"/api/access/update_scan_actions",
             data={"data": encrypt(
@@ -314,7 +313,7 @@ def save_authorization(qr, ws):
         if compare_qr == "":
             continue
         compare_data = compare_qr.split(".")
-        if compare_data[0] == "6" and data[0] == "6" and compare_data[2] == data[1]:
+        if compare_data[0] == "6" and data[0] == "6" and compare_data[2] == data[2]:
             ans = True
             if len(compare_data) > 3:
                 access_identifier = compare_data[3]
@@ -439,49 +438,60 @@ def encrypt(data):
 
 
 def server_updater():
-    global cloud_server_domain, login_token, bookingOffice_id
-    while True:
-        master_active = True
-        with open(ACTIVE_MASTER_PATH, 'r', encoding='utf-8', errors='replace') as df:
-            master_active = "1" == df.read().strip()
-            df.close()
-        if not master_active:
-            break
-        await_time = SERVER_UPDATE_TIME
-        try:
-            ips = subprocess.getstatusoutput('hostname -I')
-            if ips[0] == 0:
-                ips_list = ips[1].strip().split(" ")
-                ip_min_number = float(ips_list[0].split(".")[-1])
-                for ip in ips_list:
-                    ip_numbers = ip.split(".")
-                    if len(ip_numbers) == 4 and float(ip_numbers[-1]) < ip_min_number:
-                        ip_min_number = float(ip_numbers[-1])
-                cloud_server_domain = Get_Rout_server()
-                credentials = log_in()
-                if credentials:
-                    [bookingOffice_id, login_token] = credentials
-                    get_users()
+    global cloud_server_domain, login_token, bookingOffice_id, active_server_updater, update_scanners
+    if not active_server_updater:
+        while True:
+            active_server_updater = True
+            master_active = True
+            with open(ACTIVE_MASTER_PATH, 'r', encoding='utf-8', errors='replace') as df:
+                master_active = "1" == df.read().strip()
+                df.close()
+            if not master_active:
+                active_server_updater = False
+                break
+            await_time = SERVER_UPDATE_TIME
+            try:
+                ips = subprocess.getstatusoutput('hostname -I')
+                if ips[0] == 0:
+                    ips_list = ips[1].strip().split(" ")
+                    ip_min_number = float(ips_list[0].split(".")[-1])
+                    for ip in ips_list:
+                        ip_numbers = ip.split(".")
+                        if len(ip_numbers) == 4 and float(ip_numbers[-1]) < ip_min_number:
+                            ip_min_number = float(ip_numbers[-1])
+                    cloud_server_domain = Get_Rout_server()
+                    credentials = log_in()
+                    if credentials:
+                        [bookingOffice_id, login_token] = credentials
+                        update_scanners = True
+                        get_users()
+                    else:
+                        # print("conection error in petitions")
+                        await_time = 60
+
                 else:
-                    print("conection error in petitions")
+                    # print("conection error in ip")
                     await_time = 60
-
-            else:
-                print("conection error in ip")
+            except:
+                # print("conection in petitions")
                 await_time = 60
-        except:
-            print("conection in petitions")
-            await_time = 60
 
-        time.sleep(await_time)
+            time.sleep(await_time)
 
 
 def socket_guardian():
-    global active_devices
+    global active_devices, update_scanners
     while True:
         new_active_devices = []
         for device in active_devices:
             try:
+                qr_list_size = 0
+                if update_scanners:
+                    with open(QR_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
+                        qr_list = df.read().strip()
+                        df.close()
+                        qr_list_size = len(qr_list.split("\n"))
+
                 if not "ws" in device or device["ws"].sock == None:
                     def ws_run():
                         ws = websocket.WebSocketApp(device["ip"],
@@ -495,13 +505,19 @@ def socket_guardian():
                         ws.run_forever()
                     Thread(target=ws_run).start()
                 elif not device["ws"].procesing:
-                    device["ws"].send(json.dumps(
-                        {'type': "Test connection", 'status': "1"}))
+                    if update_scanners:
+                        device["ws"].send(json.dumps({'type': 'updateDevice',
+                                                      'size': [qr_list_size, 0], 'status': "1"})+"////\n" + datetime.datetime.now().strftime("%mFu%dse%Ypong"))
+                    else:
+                        device["ws"].send(json.dumps(
+                            {'type': "Test connection", 'status': "1"}))
             except:
                 print("error in "+device["ip"])
             finally:
                 new_active_devices.append(device)
 
+        if update_scanners:
+            update_scanners = False
         active_devices = new_active_devices
 
         time.sleep(0.8)
@@ -555,11 +571,11 @@ def socket_on_message(ws, msg):
                     access = "Access granted-E.0"
                 else:
                     access = "Access denied.-1"
-                # print(access)
                 ws.send(json.dumps(
                     {'type': "authTicket", 'status': "1", 'size': 1})+"////\n"+access)
             elif header["type"] == "delTickets":
-                save_authorization(req[1], ws)
+                for access in req[1].split("\n"):
+                    save_authorization(access, ws)
             ws.send(json.dumps({'type': "recived", 'status': "1"}))
 
         ws.procesing = False
@@ -715,7 +731,6 @@ if __name__ == "__main__":
 
                     server_update = Thread(target=server_updater)
                     server_update.start()
-
 
                     with open(ACTIVE_MASTER_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
                         dfw.write("1")
