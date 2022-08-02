@@ -177,8 +177,6 @@ def Parte_Fin_QR(x):
 
 
 
-
-
 #---------------------------------------------------------------------------------------
 
 def Decision_Telado(Teclado):
@@ -199,10 +197,6 @@ def Guardar_Telado(Teclado):
 
 def Activar_Telado():
     Set_File(STATUS_TECLADO, '1')    #Escrivir_Estados('1',8) # Cambiar estado del QR
-
-
-
-
 
 
 #---------------------------------------------------------------------------------------
@@ -238,13 +232,6 @@ def Guardar_Tag(Tag):
     TagG = TagG.replace ("TR:","")
     Clear_File(COM_NFC)          # Borrar QR
     Set_File(COM_NFC, TagG)       # Guardar QR
-
-
-
-
-
-
-
 
 
 #---------------------------------------------------------------------------------------
@@ -306,9 +293,6 @@ def Procesar_Datos(rcv):
             elif    Valido == -1:   No_Valido_QR(x)         #No valido
             #elif    Valido == -2:   print Valido #basio no hay cadena
             """
-
-
-
 
 
 #---------------------------------------------------------------------------------------
