@@ -34,8 +34,7 @@ FM_Mensajes = 1     # 0: NO print  1: Print
 
 TIEMPO_MODBUS_ESPERA = 500 # 500 milisegundo de espera para la respuesta
 
-Modbus_N_Dispositivos      = 0
-Modbus_ID_Dispositivos     = []
+
 #-------------------------------------------------------
 #           definiciones tramas Modbus
 #-------------------------------------------------------
@@ -62,7 +61,7 @@ FUN_RESPUESTAS                  = "3000"        #respuesta de dispotivos
 FUN_RESPUESTAS_OK               = "3001"        #respuesta de dispotivo OK o realizado
 
 FUN_DATA_M_USUARIO              = "4001"        #Verificacion Rapida de datos
-FUN_SET_COM_M_USUARIO           = "4002"        #Pedir comando
+FUN_SET_COM_M_USUARIO           = "4002"        #Embiar comando Modulo sauro
 
 
 #---------- Adicionales para comados 4002 para modulo usuario
@@ -287,8 +286,7 @@ def Get_Trama_COMAN_Modulo_Usuario(ID,TIPO):
 
 #---------------------------------------------------
 def Get_Dispositivos():
-    global Modbus_N_Dispositivos
-    global Modbus_ID_Dispositivos
+
 
     Modbus_N_Dispositivos=0
     Modbus_ID_Dispositivos = []
@@ -302,6 +300,8 @@ def Get_Dispositivos():
 
             Modbus_ID_Dispositivos.append( Modu_N[Modulo])
             Modbus_N_Dispositivos = Modbus_N_Dispositivos + 1
+    return Modbus_N_Dispositivos, Modbus_ID_Dispositivos
+
 #---------------------------------------------------
 
 
@@ -342,13 +342,13 @@ def Separacion_trama_Recepcion(Trama):
 
 
 
-
+"""
 if FM_Mensajes: print 'Modbus'
 
 print Separacion_trama_Recepcion('!000130000002?')
 print Separacion_trama_Recepcion('!000130000026:<123123.23423sadsdgfweerw>?')
 print Separacion_trama_Recepcion('!000130000017:<TN:4545awdsgfad>?')
-
+"""
 
 
 

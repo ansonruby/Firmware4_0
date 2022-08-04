@@ -40,7 +40,7 @@ from Lib_Rout import *  # importar con los mismos nombres
 #                       CONSTANTES
 #-----------------------------------------------------------
 
-SQ_Mensajes = 0    # 0: NO print  1: Print
+SQ_Mensajes = 1    # 0: NO print  1: Print
 
 Puerto_Serial = '/dev/ttyS0'
 port = serial.Serial(Puerto_Serial, baudrate=9600, timeout=1)
@@ -53,8 +53,6 @@ Fin_QR = ''         # parte Final de un qr
 T_Maximo = 7        # timepo maximo para verificar un repetido para tipo  3 o tiket
 T_Nuev_QR = 0       # timepo de inicioa de un nuevo qr
 T_Repe_QR = 0       # timepo de inicioa de un nuevo qr
-
-Memoria_RX =""
 
 
 def Tx_datos():
@@ -281,8 +279,7 @@ def Validar_Trama(x):
 
 #---------------------------------------------------------------------------------------
 def Almacenar_Trama(x):
-    print 'Valido:' + x
-
+    #print 'Valido:' + x
     if 'TN:' in x:      Decision_Tag(x)#print 'tag'
     elif 'TR:' in x:    Decision_Tag(x)#print 'tag'
     elif 'TC:' in x:    Decision_Telado(x)#print 'tag'
@@ -290,21 +287,13 @@ def Almacenar_Trama(x):
 
 
 
-
 #---------------------------------------------------------------------------------------
 def Procesar_Datos(rcv):
     global SQ_Mensajes
-    rcv = rcv.replace ('\r',"")
     if SQ_Mensajes: print 'Datos RX:' + rcv
-
-    #Memoria_RX = rcv.split('?', maxsplit=1)
-
-
-
     Lineas = rcv.split('\r')
     for x in Lineas:
         if(len(x)>0):
-
             if SQ_Mensajes: print 'RX_1:' + x +'Tama:'+ str(len(x))
             if x.count('>') >= 2:
                 x1=x.split('>')
@@ -312,17 +301,19 @@ def Procesar_Datos(rcv):
                 #print x1[1]+'>'
                 x=x1[0]+'>'
 
-
             Valido = Validar_Trama(x)
-            print 'Valido:' + str(Valido)
-            #if      Valido == 1:    print 'Valido:' + x
-
             if      Valido == 1:    Almacenar_Trama(x)#print 'Valido:' + x #print 'QR valido' #Decision_Qr(x)          #QR valido
             elif    Valido == 2:    Parte_Inicial_QR(x) #print 'Inicio QR' #Parte_Inicial_QR(x)     #Inicio QR
             elif    Valido == 3:    Parte_Fin_QR(x) #print 'Fin QR'    #Parte_Fin_QR(x)         #Fin QR
             #elif    Valido == -1:   print 'No valido:' + x +'Tama:'+ str(len(x)) #print 'No valido' #No_Valido_QR(x)         #No valido
-
-
+            """
+            #Valido = Validar_QR(x)
+            if      Valido == 1:    Decision_Qr(x)          #QR valido
+            elif    Valido == 2:    Parte_Inicial_QR(x)     #Inicio QR
+            elif    Valido == 3:    Parte_Fin_QR(x)         #Fin QR
+            elif    Valido == -1:   No_Valido_QR(x)         #No valido
+            #elif    Valido == -2:   print Valido #basio no hay cadena
+            """
 
 
 
@@ -342,7 +333,7 @@ def Datos_Serial():
             T_rcv = len(rcv)
             if T_rcv >= 1:
                 if SQ_Mensajes: print 'Cuantos:' + str(T_rcv)
-                #print 'RX:' + rcv
+                print 'RX:' + rcv
                 Procesar_Datos(rcv)
 
 
