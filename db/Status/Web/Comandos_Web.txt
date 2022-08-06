@@ -1,1 +1,1 @@
-C.R:Ethernet.I:192.168.1.6.G:192.168.1.1.D:8.8.8.8.E
+C.R:Ethernet.D

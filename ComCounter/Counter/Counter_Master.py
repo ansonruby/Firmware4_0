@@ -38,7 +38,7 @@ ACTIVE_MASTER_PATH = DB_DIR_NAME+"/activeConection.txt"
 ACTIVE_CONECTION = CURRENT_DIR_PATH+"/../db/flagtosend.txt"
 
 # Cloud server constants
-SERVER_UPDATE_TIME = 600
+SERVER_UPDATE_TIME = 5
 
 # Cloud server variables
 cloud_server_domain = ""
@@ -87,8 +87,9 @@ def Get_Rout_server():
 
 def log_in():
     try:
-        data = encrypt({"attributes": {'email': "counter.planta@ocoplast.com",
-           'password': "C0unt3rp14ntA2022"}}).decode("utf-8")
+
+        data = encrypt({"attributes": {'email': "master.residencial@fuseaccess.com",
+                                       'password': "M45tErR3siDeNC1aL"}}).decode("utf-8")
         # data = encrypt({"attributes": {'email': "taquilla.reja@fusepong.com",
         #                'password': "password"}}).decode("utf-8")
         petition = requests.post(
@@ -255,6 +256,7 @@ def auth_petition(qr, ws):
             ans = True
             break
         elif len(data) == 2 and len(compare_data) == 2 and data[0] == "" and data[1] == compare_data[1]:
+            qr = "."+compare_data[0]
             access_identifier = "2"
             ans = True
             break
@@ -327,6 +329,7 @@ def save_authorization(qr, ws):
             ans = True
             break
         elif len(data) == 2 and len(compare_data) == 2 and data[0] == "" and data[1] == compare_data[1]:
+            data[1] = "."+compare_data[0]
             access_identifier = "2"
             ans = True
             break
@@ -670,6 +673,9 @@ def server_http():
 
 
 if __name__ == "__main__":
+    with open(ACTIVE_MASTER_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
+        dfw.write("")
+        dfw.close()
     Thread(target=server_http).start()
     time.sleep(0.8)
     while True:
