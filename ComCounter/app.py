@@ -35,7 +35,7 @@ class WsEvents(Websocket):
                 if text == "1":
                     with open(SEND_DATA_PATH, 'r', encoding='utf-8', errors='replace') as df:
                         ticketsPack = ""
-                        dataList = df.read().split('\n')
+                        dataList = df.read().strip().split('\n')
                         df.close()
                         ReadLine = 0
                         while(ReadLine < len(dataList)):
