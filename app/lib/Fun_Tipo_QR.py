@@ -32,7 +32,7 @@ from lib.Lib_Regular_Expression import *   #
 #-------------------------------------------------------
 # inicio de variable	--------------------------------------
 
-FTQ_Mensajes = 1     # 0: NO print  1: Print
+FTQ_Mensajes = 0     # 0: NO print  1: Print
 
 
 
