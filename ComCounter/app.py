@@ -9,7 +9,7 @@ AWAIT_TIME = 0.2
 AWAIT_PACKAGE_TIME = 0.02
 MAX_PACKAGE_BYTES_SIZE = 6000
 AWAIT_TIME_FROM_LAST_MESSAGE = 3
-SHOW_PRINT_MSG = True
+SHOW_PRINT_MSG = False
 
 DB_DIR_NAME = os.path.dirname(os.path.realpath(__file__))+"/db"
 
