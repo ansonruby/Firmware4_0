@@ -105,11 +105,12 @@ def Decision_General():
         Status_Peticion_Counter = Decision_Counter(R_Q,T_A)
         if Status_Peticion_Counter != -2:
             if Status_Peticion_Counter == -1: # Error en el counter
-                Status_Peticion_Dispo = Decision_Dispositivo(R_Q,T_A)
-                if  Status_Peticion_Dispo != -2:
-                    if  Status_Peticion_Dispo == -1:# Error en el  Dispositivo
-                        Accion_Torniquete ('Error') # Qr no valido
-                else: Accion_Torniquete ('Error') # Qr no valido
+                Accion_Torniquete ('Error')
+                #Status_Peticion_Dispo = Decision_Dispositivo(R_Q,T_A)
+                #if  Status_Peticion_Dispo != -2:
+                #    if  Status_Peticion_Dispo == -1:# Error en el  Dispositivo
+                #        Accion_Torniquete ('Error') # Qr no valido
+                #else: Accion_Torniquete ('Error') # Qr no valido
         else: Accion_Torniquete ('Error') # Qr no valido
     # ---------------------------------------------------------
     else: Accion_Torniquete ('Error') # no hay prioridad

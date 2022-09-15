@@ -32,7 +32,7 @@ from lib.Lib_Regular_Expression import *   #
 #-------------------------------------------------------
 # inicio de variable	--------------------------------------
 
-FTQ_Mensajes = 0     # 0: NO print  1: Print
+FTQ_Mensajes = 1     # 0: NO print  1: Print
 
 
 
@@ -883,6 +883,8 @@ def Enviar_QR_Counter(QR, Tiempo_Actual):
         # print Total_TX
         Set_File(CONT_SEND_DATA_PATH, Total_TX)  # enviar el QR
         Set_File(CONT_SEND_FLAG_PATH, '1')
+        Clear_File(CONT_RECEIVED_DATA_PATH)
+        Clear_File(CONT_RECEIVED_FLAG_PATH)
         T_E = T_Antes = -1
         while 1:
             if Get_File(CONT_RECEIVED_FLAG_PATH) == "1":
@@ -918,7 +920,7 @@ def Enviar_QR_Counter(QR, Tiempo_Actual):
                 T_E = int(time.time()*1000.0)  # Tiempo
             Tiempo_diferencia = T_E - T_Antes
             # print str(Tiempo_diferencia)
-            if Tiempo_diferencia >= 2000:
+            if Tiempo_diferencia >= 6000:
                 if FTQ_Mensajes:    print 'procesar por no respuesta T:' + str(Tiempo_diferencia)
                 Clear_File(CONT_SEND_DATA_PATH)
                 Clear_File(CONT_SEND_FLAG_PATH)

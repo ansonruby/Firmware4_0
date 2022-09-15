@@ -79,21 +79,22 @@ class Websocket(threading.Thread):
 
     def data_transfer(self):
         OPCODE, PAYLOAD_DATA = self.parse_frame()
-
-        if OPCODE == self.TEXT:
-            self.onMessage(PAYLOAD_DATA.decode('utf-8'))
-        elif OPCODE == self.BINARY:
-            self.onMessage(PAYLOAD_DATA)
-        elif OPCODE == self.CLOSE:
-            self.state = self.CLOSING
-            self.close_handshake()
-        elif OPCODE == self.PING:
-            pass
-        elif OPCODE == self.PONG:
-            pass
-        else:
-            self.close_handshake(1002)
-
+        try:
+            if OPCODE == self.TEXT:
+                self.onMessage(PAYLOAD_DATA.decode('utf-8'))
+            elif OPCODE == self.BINARY:
+                self.onMessage(PAYLOAD_DATA)
+            elif OPCODE == self.CLOSE:
+                self.state = self.CLOSING
+                self.close_handshake()
+            elif OPCODE == self.PING:
+                pass
+            elif OPCODE == self.PONG:
+                pass
+            else:
+                self.close_handshake(1002)
+        except:
+            self.onError()
     def parse_frame(self):
         try:
             data = self.conn.recv(2)

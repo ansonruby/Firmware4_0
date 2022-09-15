@@ -3,9 +3,8 @@ import os
 import json
 import requests
 import time
-from threading import Thread
 
-SERVER_PORT = 1234
+SERVER_PORT = 1238
 AWAIT_TIME = 0.2
 AWAIT_PACKAGE_TIME = 0.02
 MAX_PACKAGE_BYTES_SIZE = 6000
@@ -31,44 +30,60 @@ class WsEvents(Websocket):
         with open(SEND_FLAG_PATH, 'r', encoding='utf-8', errors='replace') as ff:
             text = ff.read()
             ff.close()
-            if(int(time.time())-self.LAST_MESSAGE_TIME <= self.DESCONECTION_MAX_TIME):
+            if text == "3" or (text != "" and time.time()-os.path.getmtime(SEND_FLAG_PATH) > 3):
+                if self.print_msg:
+                    print("[SERVER]= Error, closed for strange desconection")
+                with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
+                    ffw.write("3")
+                    ffw.close()
+                self.close()
+            elif(int(time.time())-self.LAST_MESSAGE_TIME <= self.DESCONECTION_MAX_TIME):
                 if text == "1":
-                    with open(SEND_DATA_PATH, 'r', encoding='utf-8', errors='replace') as df:
-                        ticketsPack = ""
-                        dataList = df.read().strip().split('\n')
-                        df.close()
-                        ReadLine = 0
-                        while(ReadLine < len(dataList)):
-                            header = dataList[ReadLine].split('.')
-                            ReadLine = ReadLine+1
-                            data = dataList[ReadLine:ReadLine +
-                                            int(header[2])]
-                            ReadLine = ReadLine+int(header[2])+1
-                            if(header[1] == "delTickets"):
-                                for i, ticket in enumerate(data):
-                                    ticketsPack += ticket+"\n"
-                                    if i == len(data)-1:
-                                        self.broadcast(json.dumps(
-                                            {'type': 'delTickets', 'status': '1'})+'////\n'+ticketsPack)
-                                        ticketsPack = ""
-                                    elif len(ticketsPack.encode('utf-8')) >= MAX_PACKAGE_BYTES_SIZE:
-                                        self.broadcast(json.dumps(
-                                            {'type': 'delTickets', 'status': '0'})+'////\n'+ticketsPack)
-                                        ticketsPack = ""
-                                        time.sleep(AWAIT_PACKAGE_TIME)
-                            elif(header[1] == "authTicket"):
-                                self.broadcast(json.dumps(
-                                    {'type': 'authTicket', 'status': '1'})+'////\n'+"\n".join(data))
-                                ticketsPack = ""
-                            elif(header[1] == "buttonExit"):
-                                self.broadcast(json.dumps(
-                                    {'type': 'buttonExit', 'status': '1'})+'////\n'+"\n".join(data))
-                                ticketsPack = ""
-                            time.sleep(self.SERVER_AWAIT_TIME)
+                    try:
+                        with open(SEND_DATA_PATH, 'r', encoding='utf-8', errors='replace') as df:
+                            ticketsPack = ""
+                            dataList = df.read().strip().split('\n')
+                            df.close()
+                            ReadLine = 0
+                            while(ReadLine < len(dataList)):
+                                header = dataList[ReadLine].split('.')
+                                ReadLine = ReadLine+1
+                                data = dataList[ReadLine:ReadLine +
+                                                int(header[2])]
+                                ReadLine = ReadLine+int(header[2])+1
+                                if(header[1] == "delTickets"):
+                                    for i, ticket in enumerate(data):
+                                        ticketsPack += ticket+"\n"
+                                        if i == len(data)-1:
+                                            self.broadcast(json.dumps(
+                                                {'type': 'delTickets', 'status': '1'})+'////\n'+ticketsPack)
+                                            ticketsPack = ""
+                                        elif len(ticketsPack.encode('utf-8')) >= MAX_PACKAGE_BYTES_SIZE:
+                                            self.broadcast(json.dumps(
+                                                {'type': 'delTickets', 'status': '0'})+'////\n'+ticketsPack)
+                                            ticketsPack = ""
+                                            time.sleep(AWAIT_PACKAGE_TIME)
+                                elif(header[1] == "authTicket"):
+                                    with open(RECIVED_DATA_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
+                                        dfw.write("")
+                                        dfw.close()
+                                    with open(RECIVED_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
+                                        dfw.write("")
+                                        dfw.close()
+                                    self.broadcast(json.dumps(
+                                        {'type': 'authTicket', 'status': '1'})+'////\n'+"\n".join(data))
+                                    ticketsPack = ""
+                                elif(header[1] == "buttonExit"):
+                                    self.broadcast(json.dumps(
+                                        {'type': 'buttonExit', 'status': '1'})+'////\n'+"\n".join(data))
+                                    ticketsPack = ""
+                                time.sleep(self.SERVER_AWAIT_TIME)
 
-                    with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
-                        ffw.write("2")
-                        ffw.close()
+                        with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
+                            ffw.write("2")
+                            ffw.close()
+                    except:
+                        self.onError()
             else:
                 if(text != "3"):
                     with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
@@ -89,7 +104,7 @@ class WsEvents(Websocket):
                     if flagState == "" or int(time.time())-self.LAST_MESSAGE_TIME >= self.DESCONECTION_MAX_TIME:
                         try:
                             accessList = requests.get(
-                                url="http://"+self.addr[0]+":8081/scannersPetition", params={"scannerAccessKey": req[1]}, timeout=1)
+                                url="http://"+self.addr[0]+":8090/scannersPetition", params={"scannerAccessKey": req[1]}, timeout=1)
                             accessList.raise_for_status()
                         except:
                             self.close()
@@ -113,6 +128,9 @@ class WsEvents(Websocket):
                             dfw.write(
                                 "header."+headerJson["type"]+"."+str(headerJson["size"])+"\n"+req[1])
                             dfw.close()
+                        with open(RECIVED_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
+                            ffw.write("1")
+                            ffw.close()
                         break
                     elif flagState == "0":
                         with open(RECIVED_DATA_PATH, 'a', encoding='utf-8', errors='replace') as dfw:
@@ -170,6 +188,10 @@ class WsEvents(Websocket):
             open(RECIVED_DATA_PATH, 'w',
                  encoding='utf-8', errors='replace').close()
 
+        with open(RECIVED_DATA_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
+            dfw.write("")
+            dfw.close()
+
         with open(SEND_FLAG_PATH, 'r', encoding='utf-8', errors='replace') as ff:
             if ff.read() != "":
                 with open(SEND_DATA_PATH, 'r', encoding='utf-8', errors='replace') as df:
@@ -214,7 +236,10 @@ class WsEvents(Websocket):
         with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
             ffw.write("3")
             ffw.close()
-        # self.close()
+        try:
+            self.close()
+        except:
+            pass
         if self.print_msg:
             print('[SERVER]= Closed conection from'+str(self.addr))
 
@@ -222,21 +247,6 @@ class WsEvents(Websocket):
 with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
     ffw.write("3")
     ffw.close()
-
-
-def flag_guard():
-    while True:
-        with open(SEND_FLAG_PATH, 'r', encoding='utf-8', errors='replace') as ff:
-            text = ff.read()
-            ff.close()
-            if(text == "1" and time.time()-os.path.getmtime(SEND_FLAG_PATH) > 5):
-                with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
-                    ffw.write("3")
-                    ffw.close()
-        time.sleep(2)
-
-
-Thread(None, flag_guard, None, ()).start()
 
 
 server = WebsocketServer("0.0.0.0", SERVER_PORT, 2,
